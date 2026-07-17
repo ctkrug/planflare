@@ -292,4 +292,22 @@ describe("renderApp", () => {
     const { loadStoredPlan } = await import("./storage");
     expect(loadStoredPlan()?.collapsedPaths).toEqual([""]);
   });
+
+  it("removes a path from persisted collapse state when it's re-expanded", async () => {
+    const { textarea, button, output } = await setup();
+    textarea.value = "irrelevant";
+    parsePlan.mockReturnValue({
+      node_type: "Root",
+      children: [{ node_type: "Child", children: [] }],
+    });
+    button.click();
+    await flush();
+
+    const toggle = output.querySelector<HTMLButtonElement>(".tree-toggle")!;
+    toggle.click();
+    toggle.click();
+
+    const { loadStoredPlan } = await import("./storage");
+    expect(loadStoredPlan()?.collapsedPaths).toEqual([]);
+  });
 });
