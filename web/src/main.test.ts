@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { EXAMPLE_PLANS } from "./examples";
 import type { PlanNode } from "./plan";
 
 const ensureParserReady = vi.fn(async () => undefined);
@@ -17,6 +18,7 @@ async function setup() {
   return {
     root,
     textarea: root.querySelector<HTMLTextAreaElement>("#plan-input")!,
+    select: root.querySelector<HTMLSelectElement>("#engine-select")!,
     button: root.querySelector<HTMLButtonElement>("#visualize-btn")!,
     output: root.querySelector<HTMLElement>("#output-content")!,
     error: root.querySelector<HTMLElement>("#input-error")!,
@@ -167,5 +169,27 @@ describe("renderApp", () => {
     await flush();
 
     expect(jumpButton.hidden).toBe(true);
+  });
+
+  it("loads and visualizes the matching example when its button is clicked", async () => {
+    const { root, textarea, select, output } = await setup();
+    parsePlan.mockReturnValue({ node_type: "Nested Loop", children: [] });
+
+    const mysqlBtn = root.querySelector<HTMLButtonElement>('.example-btn[data-engine="mysql"]')!;
+    mysqlBtn.click();
+    await flush();
+
+    expect(select.value).toBe("mysql");
+    expect(textarea.value).toBe(EXAMPLE_PLANS.mysql);
+    expect(parsePlan).toHaveBeenCalledWith("mysql", EXAMPLE_PLANS.mysql.trim());
+    expect(output.querySelector(".tree")).not.toBeNull();
+  });
+
+  it("has a working example button for every engine", async () => {
+    const { root } = await setup();
+    const engines = [...root.querySelectorAll<HTMLButtonElement>(".example-btn")].map(
+      (b) => b.dataset.engine,
+    );
+    expect(engines.sort()).toEqual(["mysql", "postgres", "sqlite"]);
   });
 });
