@@ -81,18 +81,54 @@ fn build_tree(rows: Vec<(i64, i64, String)>) -> Result<PlanNode, ParseError> {
     }
 }
 
+/// Builds the subtree rooted at `id`, walking `child_ids` iteratively (an
+/// explicit stack, not call-stack recursion) so a pathologically deep or
+/// long chain of plan rows - e.g. thousands of nested subqueries - can't
+/// blow the stack. See `sqlite.rs` adversarial tests for the regression
+/// this guards against.
 fn attach(
     id: i64,
     nodes: &mut HashMap<i64, PlanNode>,
     child_ids: &HashMap<i64, Vec<i64>>,
 ) -> PlanNode {
-    let mut node = nodes.remove(&id).expect("row id must exist in node map");
-    if let Some(kids) = child_ids.get(&id) {
-        for kid in kids {
-            node.children.push(attach(*kid, nodes, child_ids));
+    struct Frame {
+        id: i64,
+        next_child_idx: usize,
+    }
+
+    let mut stack = vec![Frame {
+        id,
+        next_child_idx: 0,
+    }];
+    let mut built: HashMap<i64, PlanNode> = HashMap::new();
+
+    while let Some(frame) = stack.last_mut() {
+        let kids = child_ids.get(&frame.id);
+        let kids_len = kids.map_or(0, |k| k.len());
+        if frame.next_child_idx < kids_len {
+            let kid_id = kids.unwrap()[frame.next_child_idx];
+            frame.next_child_idx += 1;
+            stack.push(Frame {
+                id: kid_id,
+                next_child_idx: 0,
+            });
+        } else {
+            let current_id = frame.id;
+            let mut node = nodes
+                .remove(&current_id)
+                .expect("row id must exist in node map");
+            if let Some(kids) = child_ids.get(&current_id) {
+                for kid_id in kids {
+                    node.children
+                        .push(built.remove(kid_id).expect("child must be built first"));
+                }
+            }
+            stack.pop();
+            built.insert(current_id, node);
         }
     }
-    node
+
+    built.remove(&id).expect("root must be built")
 }
 
 fn node_from_detail(detail: &str) -> PlanNode {
@@ -144,5 +180,33 @@ mod tests {
     #[test]
     fn rejects_empty_input() {
         assert!(parse("").is_err());
+    }
+
+    #[test]
+    fn parses_a_very_deep_subquery_chain_without_overflowing_the_stack() {
+        let depth = 50_000;
+        let mut text = String::new();
+        for i in 1..=depth {
+            let parent = if i == 1 { 0 } else { i - 1 };
+            text.push_str(&format!("{i}|{parent}|0|SCAN t{i}\n"));
+        }
+        let plan = parse(&text).unwrap();
+
+        let mut seen = 1;
+        let mut cur = &plan;
+        while let Some(child) = cur.children.first() {
+            seen += 1;
+            cur = child;
+        }
+        assert_eq!(seen, depth);
+    }
+
+    #[test]
+    fn ignores_a_row_whose_parent_is_itself() {
+        // A self-referential parent id can't be a legitimate SQLite plan row,
+        // but the parser must not loop or panic on it - it should simply
+        // fail to resolve a root rather than treat the row as top-level.
+        let plan = parse("5|5|0|SCAN t1");
+        assert!(plan.is_err());
     }
 }
