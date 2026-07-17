@@ -213,6 +213,27 @@ describe("renderApp", () => {
     expect(parsePlan).toHaveBeenCalledWith("sqlite", "1|0|0|SCAN t");
   });
 
+  it("shows an inline error instead of crashing when the stored plan text no longer parses", async () => {
+    localStorage.setItem(
+      "planscope:last-plan",
+      JSON.stringify({ engine: "postgres", text: "garbage from a hand-edited storage entry", collapsedPaths: [] }),
+    );
+    parsePlan.mockImplementation(() => {
+      throw new Error("no plan lines found");
+    });
+
+    const { renderApp } = await import("./main");
+    document.body.innerHTML = '<div id="app"></div>';
+    const root = document.getElementById("app")!;
+    expect(() => renderApp(root)).not.toThrow();
+    await flush();
+
+    const error = root.querySelector<HTMLElement>("#input-error")!;
+    expect(error.hidden).toBe(false);
+    expect(error.textContent).toBe("no plan lines found");
+    expect(root.querySelector("#output-content .tree")).toBeNull();
+  });
+
   it("mounts normally with no stored plan (nothing to restore)", async () => {
     const { output } = await setup();
     expect(output.querySelector(".output-placeholder")).not.toBeNull();
