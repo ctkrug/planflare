@@ -40,16 +40,22 @@ you've gone looking for it.
 
 ## Status
 
-Early scaffold — see [`docs/VISION.md`](docs/VISION.md) for the full design and
-[`docs/BACKLOG.md`](docs/BACKLOG.md) for the build plan.
+The core loop works end to end: paste a Postgres, MySQL, or SQLite plan, click Visualize, and
+get a collapsible cost tree with the hottest node and row-estimate mismatches called out. See
+[`docs/VISION.md`](docs/VISION.md) for the full design and [`docs/BACKLOG.md`](docs/BACKLOG.md)
+for what's left.
 
 ## Development
+
+Building the UI requires the `wasm32-unknown-unknown` Rust target and a `wasm-bindgen-cli`
+matching the version pinned in `crates/parser/Cargo.toml` (see `.github/workflows/ci.yml`
+for the exact versions used in CI).
 
 ```sh
 # parser
 cd crates/parser && cargo test
 
-# UI
+# UI (npm scripts build the wasm bindings automatically, see scripts/build-wasm.sh)
 cd web && npm install && npm run dev
 ```
 
