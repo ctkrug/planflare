@@ -202,11 +202,29 @@ mod tests {
     }
 
     #[test]
-    fn ignores_a_row_whose_parent_is_itself() {
-        // A self-referential parent id can't be a legitimate SQLite plan row,
-        // but the parser must not loop or panic on it - it should simply
-        // fail to resolve a root rather than treat the row as top-level.
-        let plan = parse("5|5|0|SCAN t1");
-        assert!(plan.is_err());
+    fn ignores_lines_that_are_not_id_parent_notused_detail_rows() {
+        // The CLI's tree-glyph rendering mode and stray blank/header lines
+        // don't have 4 pipe-delimited fields - they should be skipped, not
+        // misparsed or treated as a hard error, as long as at least one real
+        // row is present.
+        let text = "QUERY PLAN\n|-- SCAN t2 (not a real row)\n0|0|0|SCAN t1\n";
+        let plan = parse(text).unwrap();
+        assert_eq!(plan.node_type, "SCAN");
+        assert_eq!(plan.relation.as_deref(), Some("t1"));
+    }
+
+    #[test]
+    fn rejects_a_non_numeric_id_or_parent() {
+        assert!(parse("abc|0|0|SCAN t1").is_err());
+        assert!(parse("0|xyz|0|SCAN t1").is_err());
+    }
+
+    #[test]
+    fn rejects_a_row_whose_parent_is_itself() {
+        // A self-referential parent id can't be a legitimate plan row: it
+        // never qualifies as top-level (its parent id is known) and no
+        // other row claims it as a child, so it should be reported as
+        // unresolvable rather than silently dropped or looped over.
+        assert!(parse("5|5|0|SCAN t1").is_err());
     }
 }
