@@ -71,6 +71,21 @@ impl PlanNode {
     }
 }
 
+// PlanNode's default (derived) drop glue recurses one stack frame per tree
+// level, so a pathologically deep chain of nodes - e.g. thousands of nested
+// SQLite subqueries - can overflow the stack when the tree is dropped, even
+// though it was built iteratively. Flatten the drop into an explicit stack
+// instead: each node's children are taken out before the node itself drops,
+// so its own (recursive-looking) Drop::drop call has nothing left to walk.
+impl Drop for PlanNode {
+    fn drop(&mut self) {
+        let mut pending = std::mem::take(&mut self.children);
+        while let Some(mut node) = pending.pop() {
+            pending.extend(std::mem::take(&mut node.children));
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ParseError {
     pub message: String,
