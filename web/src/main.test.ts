@@ -293,6 +293,30 @@ describe("renderApp", () => {
     expect(loadStoredPlan()?.collapsedPaths).toEqual([""]);
   });
 
+  it("does nothing when the engine select's value is tampered with off the known list", async () => {
+    const { select, button } = await setup();
+    // <select>.value silently resets to "" for an out-of-list value, but
+    // guard against any environment/extension that could force something
+    // else through - the click handler must never call the parser with it.
+    Object.defineProperty(select, "value", { value: "oracle", configurable: true });
+
+    button.click();
+    await flush();
+
+    expect(parsePlan).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when an example button's data-engine is tampered with", async () => {
+    const { root } = await setup();
+    const mysqlBtn = root.querySelector<HTMLButtonElement>('.example-btn[data-engine="mysql"]')!;
+    mysqlBtn.dataset.engine = "oracle";
+
+    mysqlBtn.click();
+    await flush();
+
+    expect(parsePlan).not.toHaveBeenCalled();
+  });
+
   it("removes a path from persisted collapse state when it's re-expanded", async () => {
     const { textarea, button, output } = await setup();
     textarea.value = "irrelevant";
