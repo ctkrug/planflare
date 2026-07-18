@@ -88,4 +88,16 @@ describe("createInspector", () => {
     expect(() => inspector.close()).not.toThrow();
     expect(inspector.element.hidden).toBe(true);
   });
+
+  it("ignores keys other than Escape", () => {
+    const inspector = createInspector();
+    document.body.appendChild(inspector.element);
+    inspector.open(node({}), trigger);
+
+    inspector.element
+      .querySelector(".inspector-panel")!
+      .dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+
+    expect(inspector.element.hidden).toBe(false);
+  });
 });
