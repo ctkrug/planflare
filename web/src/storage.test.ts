@@ -55,4 +55,27 @@ describe("storage", () => {
   it("clearing when nothing is stored is a safe no-op", () => {
     expect(() => clearStoredPlan()).not.toThrow();
   });
+
+  it("treats an environment where localStorage throws on mere access as unavailable", () => {
+    // Some sandboxed/private-mode browsers throw just from referencing
+    // `localStorage` (not only from calling its methods) - simulate that by
+    // replacing the global binding with a throwing accessor.
+    const original = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      get(): Storage {
+        throw new DOMException("access denied", "SecurityError");
+      },
+    });
+
+    try {
+      expect(loadStoredPlan()).toBeNull();
+      expect(() =>
+        saveStoredPlan({ engine: "postgres", text: "x", collapsedPaths: [] }),
+      ).not.toThrow();
+      expect(() => clearStoredPlan()).not.toThrow();
+    } finally {
+      if (original) Object.defineProperty(globalThis, "localStorage", original);
+    }
+  });
 });
