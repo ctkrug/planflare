@@ -6,7 +6,7 @@
   --surface: #fafaf9;
   --surface-2: #e7e9ed;
   --text: #14161a;
-  --muted: #6b7280;
+  --muted: #5f6572;
   --accent: #d6331b;
   --accent-support: #1d4ed8;
   --success: #15803d;
@@ -266,7 +266,7 @@ button:focus-visible {
   font-size: 0.8rem;
   margin: 0;
   padding: var(--space-1);
-  background: var(--surface-2);
+  background: var(--surface);
   border-left: 3px solid var(--danger);
 }
 
