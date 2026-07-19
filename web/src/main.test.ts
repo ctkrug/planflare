@@ -50,6 +50,17 @@ describe("renderApp", () => {
     expect(parsePlan).not.toHaveBeenCalled();
   });
 
+  it("treats whitespace-only input the same as empty, without calling the parser", async () => {
+    const { textarea, button, error } = await setup();
+
+    textarea.value = "   \n\t  \n  ";
+    button.click();
+
+    expect(error.hidden).toBe(false);
+    expect(error.textContent).toBe("Paste a plan first.");
+    expect(parsePlan).not.toHaveBeenCalled();
+  });
+
   it("renders the cost tree and collapses the input rail on a successful parse", async () => {
     const { textarea, button, output, railBody } = await setup();
     textarea.value = "Seq Scan on users (cost=0.00..1.00 rows=1 width=4)";
