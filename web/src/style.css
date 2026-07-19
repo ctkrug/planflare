@@ -180,6 +180,7 @@ select {
   background-size: 10px 6px;
   color: var(--text);
   padding: var(--space-1);
+  min-height: 44px;
   appearance: none;
   cursor: pointer;
   transition: border-color var(--transition-ui), box-shadow var(--transition-ui);
@@ -217,9 +218,17 @@ button {
   color: var(--surface);
   font-weight: 700;
   padding: var(--space-1) var(--space-2);
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: transform var(--transition-ui), box-shadow var(--transition-ui);
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0 0 var(--text);
+}
+
+button[hidden] {
+  display: none;
 }
 
 button:hover {
@@ -243,6 +252,10 @@ button:focus-visible {
   border: 1px solid var(--text);
   border-radius: var(--radius);
   padding: 4px 10px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -377,6 +390,7 @@ button:focus-visible {
   width: 22px;
   height: 22px;
   min-width: 22px;
+  min-height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
