@@ -34,6 +34,20 @@ describe("renderTree", () => {
     expect(element.querySelectorAll(".tree-label")[10]?.textContent).toBe("Depth 10");
   });
 
+  it("exposes each focused row as a leveled tree item with expand state", () => {
+    const { element } = renderTree(
+      node({ node_type: "Root", children: [node({ node_type: "Child" })] }),
+    );
+    const rows = element.querySelectorAll<HTMLElement>(".tree-row");
+
+    expect(rows[0].getAttribute("role")).toBe("treeitem");
+    expect(rows[0].getAttribute("aria-level")).toBe("1");
+    expect(rows[0].getAttribute("aria-expanded")).toBe("true");
+    expect(rows[1].getAttribute("role")).toBe("treeitem");
+    expect(rows[1].getAttribute("aria-level")).toBe("2");
+    expect(rows[1].hasAttribute("aria-expanded")).toBe(false);
+  });
+
   it("collapsing a node removes its subtree from the DOM, not just visually", () => {
     const { element } = renderTree(
       node({ node_type: "Root", children: [node({ node_type: "Child" })] }),
