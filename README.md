@@ -19,7 +19,7 @@ you've gone looking for it.
 
 ## Features
 
-- **Multi-engine parsing** — a real parser (not regex) for Postgres `EXPLAIN (ANALYZE)` text
+- **Multi-engine parsing** — a real parser (not regex) for Postgres text and `FORMAT JSON`
   output, MySQL `EXPLAIN FORMAT=JSON`, and SQLite `EXPLAIN QUERY PLAN`, all normalized into one
   plan-tree model.
 - **Cost hotspot highlighting** — the node responsible for the bulk of actual runtime (by
@@ -36,7 +36,6 @@ you've gone looking for it.
 
 ## Planned features
 
-- Postgres `EXPLAIN (FORMAT JSON)` support, auto-detected alongside the existing text format.
 - A landing site (`site/`) sharing the app's design system.
 - A full accessibility pass (contrast, keyboard-only operation) beyond what's already wired up.
 

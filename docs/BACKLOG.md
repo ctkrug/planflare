@@ -45,7 +45,7 @@ checks, not vibes. Story 1 is the wow moment: it ships before anything optional.
   - Nodes without `ANALYZE` data (no `actual_rows`) show no mis-estimation badge — never a false
     positive from missing data.
 
-- [ ] **7. Postgres JSON-format support (`EXPLAIN (FORMAT JSON)`)**
+- [x] **7. Postgres JSON-format support (`EXPLAIN (FORMAT JSON)`)**
   - Pasting valid Postgres JSON-format output parses to the same `PlanNode` tree as the
     equivalent text-format dump, cross-checked on one fixture query.
   - The engine selector's "PostgreSQL" option auto-detects text vs. JSON input (leading `[`/`{`)
