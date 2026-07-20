@@ -39,6 +39,18 @@ describe("renderApp", () => {
     localStorage.clear();
   });
 
+  it("renders the final product name and portfolio links", async () => {
+    const { root } = await setup();
+
+    expect(root.querySelector(".wordmark")?.textContent).toBe("Planflare");
+    expect(root.querySelector<HTMLAnchorElement>(".repo-link")?.href).toBe(
+      "https://github.com/ctkrug/planscope",
+    );
+    expect(root.querySelector<HTMLAnchorElement>(".site-footer a")?.href).toBe(
+      "https://apps.charliekrug.com/",
+    );
+  });
+
   it("shows an inline error and never calls the parser when the input is empty", async () => {
     const { button, output, error } = await setup();
 

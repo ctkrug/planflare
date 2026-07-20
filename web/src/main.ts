@@ -12,54 +12,89 @@ const ENGINES: Engine[] = ["postgres", "mysql", "sqlite"];
 export function renderApp(root: HTMLElement): void {
   root.innerHTML = `
     <header class="site-header">
-      <span class="wordmark" id="wordmark">Plan<em>scope</em></span>
-      <p class="tagline">Paste an EXPLAIN plan. See the tree, and the node that's slow.</p>
+      <div class="brand-lockup">
+        <span class="wordmark" id="wordmark">Plan<em>flare</em></span>
+        <div>
+          <h1 class="tagline">Postgres EXPLAIN ANALYZE visualizer for faster fixes</h1>
+          <p class="header-subhead">Paste a plan. See the tree and the node consuming the runtime.</p>
+        </div>
+      </div>
+      <a class="repo-link" href="https://github.com/ctkrug/planscope">View on GitHub <span aria-hidden="true">↗</span></a>
     </header>
-    <main class="workspace">
-      <aside class="input-rail" aria-label="Plan input">
-        <div class="input-rail-head">
-          <h2>Input</h2>
-          <button id="toggle-input" class="ghost-btn" type="button" aria-expanded="true" aria-controls="input-rail-body">
-            Collapse
-          </button>
-        </div>
-        <div id="input-rail-body">
-          <label for="engine-select">Engine</label>
-          <select id="engine-select">
-            ${ENGINES.map((e) => `<option value="${e}">${engineLabel(e)}</option>`).join("")}
-          </select>
-          <label for="plan-input">EXPLAIN output</label>
-          <textarea
-            id="plan-input"
-            placeholder="Paste EXPLAIN (ANALYZE) output here..."
-            spellcheck="false"
-          ></textarea>
-          <button id="visualize-btn" type="button">Visualize</button>
-          <p id="input-error" class="input-error" role="alert" hidden></p>
-          <div class="example-row" role="group" aria-label="Try an example plan">
-            <span class="example-label">Try an example</span>
-            ${ENGINES.map(
-              (e) =>
-                `<button type="button" class="ghost-btn example-btn" data-engine="${e}">${engineLabel(e)}</button>`,
-            ).join("")}
+    <main class="page-main">
+      <div class="workspace">
+        <aside class="input-rail" aria-label="Plan input">
+          <div class="input-rail-head">
+            <h2>Input</h2>
+            <button id="toggle-input" class="ghost-btn" type="button" aria-expanded="true" aria-controls="input-rail-body">
+              Collapse
+            </button>
           </div>
-          <button id="clear-saved-btn" class="ghost-btn" type="button">
-            Clear saved plan
-          </button>
+          <div id="input-rail-body">
+            <label for="engine-select">Engine</label>
+            <select id="engine-select">
+              ${ENGINES.map((e) => `<option value="${e}">${engineLabel(e)}</option>`).join("")}
+            </select>
+            <label for="plan-input">EXPLAIN output</label>
+            <textarea
+              id="plan-input"
+              placeholder="Paste EXPLAIN (ANALYZE) output here..."
+              spellcheck="false"
+            ></textarea>
+            <button id="visualize-btn" type="button">Visualize</button>
+            <p id="input-error" class="input-error" role="alert" hidden></p>
+            <div class="example-row" role="group" aria-label="Try an example plan">
+              <span class="example-label">Try an example</span>
+              ${ENGINES.map(
+                (e) =>
+                  `<button type="button" class="ghost-btn example-btn" data-engine="${e}">${engineLabel(e)}</button>`,
+              ).join("")}
+            </div>
+            <button id="clear-saved-btn" class="ghost-btn" type="button">
+              Clear saved plan
+            </button>
+          </div>
+        </aside>
+        <section class="output-panel" aria-label="Cost tree">
+          <div class="output-panel-head">
+            <h2>Cost tree</h2>
+            <button id="jump-hottest-btn" class="ghost-btn" type="button" hidden>
+              Jump to hottest node
+            </button>
+          </div>
+          <div id="output-content" aria-live="polite">
+            <p class="output-placeholder">Paste a plan and click Visualize to see the cost tree.</p>
+          </div>
+        </section>
+      </div>
+
+      <section class="explain-guide" aria-labelledby="guide-heading">
+        <div class="guide-intro">
+          <p class="guide-index">QUERY PLAN READER / 02</p>
+          <h2 id="guide-heading">Turn EXPLAIN output into a diagnosis</h2>
+          <p>A Postgres EXPLAIN ANALYZE visualizer should answer one practical question: which operation is making this query slow? Planflare parses the plan in your browser, renders its parent and child operations, and marks the node with the highest self-time. That keeps an expensive sequential scan or join visible instead of buried in copied terminal output.</p>
+          <p>The same view accepts MySQL <code>EXPLAIN FORMAT=JSON</code> and SQLite <code>EXPLAIN QUERY PLAN</code>. Each parser converts engine-specific fields into one tree, so you can use the same reading pattern when an application moves between databases. The pasted text stays on your device because the Rust parser runs as WebAssembly with no upload step.</p>
         </div>
-      </aside>
-      <section class="output-panel" aria-label="Cost tree">
-        <div class="output-panel-head">
-          <h2>Cost tree</h2>
-          <button id="jump-hottest-btn" class="ghost-btn" type="button" hidden>
-            Jump to hottest node
-          </button>
+
+        <div class="benefit-grid" aria-label="Planflare capabilities">
+          <article><span>01</span><h3>Find runtime hotspots</h3><p>Self-time subtracts child duration from each node's inclusive total, preventing the root operation from winning by default.</p></article>
+          <article><span>02</span><h3>Catch estimate errors</h3><p>A blue badge flags row estimates that differ from actual rows by more than 10 times, a useful clue when the planner chose the wrong join or scan.</p></article>
+          <article><span>03</span><h3>Inspect the full node</h3><p>Open any row to read startup cost, total cost, loops, relation, and available timing fields without expanding the raw plan again.</p></article>
         </div>
-        <div id="output-content" aria-live="polite">
-          <p class="output-placeholder">Paste a plan and click Visualize to see the cost tree.</p>
+
+        <div class="faq">
+          <h2>Query plan visualizer FAQ</h2>
+          <details><summary>What is a Postgres EXPLAIN ANALYZE visualizer?</summary><p>It converts PostgreSQL's measured execution plan into a visual hierarchy. Planflare uses actual timing and row counts when they are present, highlights the operation with the highest self-time, and keeps the original estimates beside the measurements.</p></details>
+          <details><summary>How does a SQL query plan visualizer find slow nodes?</summary><p>Planflare compares each node's measured total time with the totals of its direct children. The remaining self-time belongs to that operation. The largest remainder gets the red hotspot treatment, while every subtree remains collapsible for deeper inspection.</p></details>
+          <details><summary>Does Planflare work as a MySQL EXPLAIN visualizer?</summary><p>Yes. Select MySQL and paste the output from <code>EXPLAIN FORMAT=JSON</code>. Nested loops, table access types, estimated rows, and query cost are normalized into the same cost tree used for PostgreSQL plans.</p></details>
+          <details><summary>Can it visualize SQLite query plans?</summary><p>Yes. Paste the rows returned by <code>EXPLAIN QUERY PLAN</code> with their id, parent, unused, and detail columns. Planflare rebuilds the parent-child structure and labels scans, searches, indexes, and subqueries.</p></details>
         </div>
       </section>
     </main>
+    <footer class="site-footer">
+      <span>Planflare parses locally. No plan text leaves this page.</span>
+      <a href="https://apps.charliekrug.com">More by Charlie Krug <span aria-hidden="true">→</span> apps.charliekrug.com</a>
+    </footer>
   `;
 
   const button = root.querySelector<HTMLButtonElement>("#visualize-btn")!;

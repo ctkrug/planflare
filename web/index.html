@@ -3,15 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Planscope — visualize EXPLAIN plans</title>
+    <title>Planflare | Postgres EXPLAIN ANALYZE visualizer for faster fixes</title>
     <meta
       name="description"
-      content="Paste a Postgres, MySQL, or SQLite EXPLAIN output and see it as an interactive cost tree."
+      content="A Postgres EXPLAIN ANALYZE visualizer that marks runtime hotspots and row-estimate errors. Also parses MySQL and SQLite plans locally."
     />
+    <meta property="og:title" content="Planflare | Find the slow node in a query plan" />
+    <meta property="og:description" content="Turn PostgreSQL, MySQL, and SQLite EXPLAIN output into an interactive cost tree that highlights runtime hotspots." />
     <link
       rel="icon"
       type="image/svg+xml"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FAFAF9'/%3E%3Crect x='1' y='1' width='30' height='30' fill='none' stroke='%2314161A' stroke-width='2'/%3E%3Cpath d='M10 25V7h7a5 5 0 010 10h-7' fill='none' stroke='%2314161A' stroke-width='3' stroke-linecap='square'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23D6331B'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FAFAF9'/%3E%3Crect x='1' y='1' width='30' height='30' fill='none' stroke='%2314161A' stroke-width='2'/%3E%3Cpath d='M9 25V7h14v4h-9v4h7v4h-7v6' fill='none' stroke='%2314161A' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23D6331B'/%3E%3C/svg%3E"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

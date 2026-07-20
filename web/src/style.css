@@ -58,6 +58,17 @@ body {
   padding: var(--space-3) var(--space-4) var(--space-2);
   border-bottom: 1px solid var(--text);
   background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
 }
 
 .wordmark {
@@ -92,9 +103,44 @@ body {
 
 .tagline {
   color: var(--muted);
-  margin: var(--space-1) 0 0;
+  margin: 0;
   font-size: 0.95rem;
+  font-weight: 700;
   max-width: 60ch;
+}
+
+.header-subhead {
+  color: var(--muted);
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+}
+
+.repo-link,
+.site-footer a {
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-underline-offset: 4px;
+  white-space: nowrap;
+  transition: color var(--transition-ui), transform var(--transition-ui);
+}
+
+.repo-link:hover,
+.site-footer a:hover {
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.repo-link:focus-visible,
+.site-footer a:focus-visible,
+.faq summary:focus-visible {
+  outline: 2px solid var(--accent-support);
+  outline-offset: 4px;
+}
+
+.page-main {
+  flex: 1;
 }
 
 .workspace {
@@ -213,6 +259,10 @@ textarea:focus-visible {
   box-shadow: 0 0 0 3px rgba(214, 51, 27, 0.25);
 }
 
+textarea:hover {
+  border-color: var(--accent);
+}
+
 button {
   background: var(--accent);
   color: var(--surface);
@@ -244,6 +294,15 @@ button:active {
 button:focus-visible {
   outline: 2px solid var(--accent-support);
   outline-offset: 2px;
+}
+
+button:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+  transform: none;
 }
 
 .ghost-btn {
@@ -530,6 +589,201 @@ button:focus-visible {
 .inspector-fields dd {
   margin: 0;
   font-weight: 700;
+}
+
+/* Below-fold product guide */
+
+.explain-guide {
+  width: min(1400px, calc(100% - 32px));
+  margin: var(--space-4) auto 64px;
+  background: var(--surface);
+  border: 1px solid var(--text);
+  box-shadow: 8px 8px 0 var(--text);
+}
+
+.guide-intro {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: 48px var(--space-4);
+  border-bottom: 1px solid var(--text);
+}
+
+.guide-index,
+.benefit-grid article > span {
+  color: var(--accent-support);
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.guide-intro h2,
+.faq h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.guide-intro h2 {
+  margin: 0;
+  max-width: 11ch;
+  font-size: clamp(2.4rem, 5vw, 4.8rem);
+  line-height: 0.95;
+}
+
+.guide-intro > p:not(.guide-index) {
+  color: var(--muted);
+  margin: 0;
+  max-width: 62ch;
+  font-size: 0.85rem;
+}
+
+.benefit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--text);
+}
+
+.benefit-grid article {
+  padding: var(--space-4);
+  border-right: 1px solid var(--text);
+}
+
+.benefit-grid article:last-child {
+  border-right: 0;
+}
+
+.benefit-grid h3 {
+  font-family: var(--font-display);
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: 1.25rem;
+}
+
+.benefit-grid p,
+.faq details p {
+  color: var(--muted);
+  max-width: 62ch;
+  font-size: 0.8rem;
+}
+
+.faq {
+  padding: 48px var(--space-4);
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 2fr);
+  column-gap: 48px;
+}
+
+.faq h2 {
+  grid-row: 1 / span 4;
+  margin: 0;
+  max-width: 10ch;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.faq details {
+  border-top: 1px solid var(--text);
+  padding: var(--space-2) 0;
+}
+
+.faq details:last-child {
+  border-bottom: 1px solid var(--text);
+}
+
+.faq summary {
+  cursor: pointer;
+  font-weight: 700;
+  transition: color var(--transition-ui), padding-left var(--transition-ui);
+}
+
+.faq summary:hover {
+  color: var(--accent);
+  padding-left: 4px;
+}
+
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--text);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+@media (max-width: 767px) {
+  .site-header,
+  .brand-lockup,
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-header {
+    padding: var(--space-2);
+  }
+
+  .brand-lockup {
+    gap: var(--space-1);
+  }
+
+  .repo-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .explain-guide {
+    width: calc(100% - 32px);
+    margin-top: var(--space-2);
+  }
+
+  .guide-intro,
+  .benefit-grid,
+  .faq {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-intro,
+  .faq {
+    padding: var(--space-4) var(--space-2);
+  }
+
+  .guide-intro {
+    gap: var(--space-3);
+  }
+
+  .benefit-grid article {
+    border-right: 0;
+    border-bottom: 1px solid var(--text);
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .benefit-grid article:last-child {
+    border-bottom: 0;
+  }
+
+  .faq {
+    row-gap: var(--space-3);
+  }
+
+  .faq h2 {
+    grid-row: auto;
+  }
+
+  .site-footer {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .site-footer a {
+    white-space: normal;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
