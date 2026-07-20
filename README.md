@@ -36,8 +36,7 @@ you've gone looking for it.
 
 ## Planned features
 
-- A landing site (`site/`) sharing the app's design system.
-- A full accessibility pass (contrast, keyboard-only operation) beyond what's already wired up.
+- Saved plan collections and shareable links.
 
 ## Stack
 

@@ -9,12 +9,14 @@ the visual system.
 ```
 crates/parser/          Rust workspace member, compiled to wasm32-unknown-unknown
   src/model.rs           PlanNode, Engine, ParseError - the one tree shape all engines converge on
-  src/postgres.rs         EXPLAIN (ANALYZE) text parser (indentation-stack based)
+  src/postgres.rs         Auto-detects text or FORMAT JSON; normalizes either into PlanNode
   src/mysql.rs            EXPLAIN FORMAT=JSON parser (recursive descent over serde_json::Value)
   src/sqlite.rs           EXPLAIN QUERY PLAN parser (id/parent linkage -> tree)
   src/lib.rs              parse(engine, text) dispatch + #[wasm_bindgen] parse_plan JS entrypoint
   tests/basic.rs          cross-engine integration tests
 scripts/build-wasm.sh    cargo build (wasm32) + wasm-bindgen -> web/src/wasm/ (generated, gitignored)
+scripts/build-site.sh    copies the independent static landing page into site/dist/
+site/                    static product landing page using the shared Swiss-grid tokens
 web/                     TypeScript + Vite UI, no framework
   src/plan.ts            PlanNode TS type + selfTimeMs/findHottestNode/isRowEstimateMismatch/
                           findHottestNodePath/pathKey/describeNodeFields
@@ -55,9 +57,9 @@ web/                     TypeScript + Vite UI, no framework
    (`focusPath` - powers "Jump to hottest node", via `findHottestNodePath`) and expand state can
    be read back out for persistence (`getCollapsedPaths`).
 7. Clicking a tree row (or Enter/Space while it's focused) calls `onNodeSelect`, which `main.ts`
-   wires to `inspector.open()` (`inspector.ts`) - a dialog listing every non-null `PlanNode`
-   field via `describeNodeFields`. Escape or a backdrop click closes it and returns focus to the
-   row that opened it.
+   wires to `inspector.open()` (`inspector.ts`) - a focus-trapped dialog listing every non-null
+   `PlanNode` field via `describeNodeFields`. Escape or a backdrop click closes it and returns
+   focus to the row that opened it.
 8. Every successful parse and every node toggle persists `{engine, text, collapsedPaths}` to
    `localStorage` (`storage.ts`, key `planscope:last-plan`); mounting the app restores it with
    no network round-trip. An explicit "Clear saved plan" button removes the entry. `examples.ts`
@@ -74,6 +76,8 @@ web/                     TypeScript + Vite UI, no framework
   `web/package.json`) so `web/src/wasm/` always exists before anything that imports it runs.
   `vite.config.ts` sets `base: "./"` so the built site works when hosted under a subpath
   (`apps.charliekrug.com/planscope`), not just at a domain root.
+- **Landing site**: `scripts/build-site.sh` produces `site/dist/` from the self-contained,
+  relative-asset landing-page source; it does not require the Vite/WASM app build.
 - **CI** (`.github/workflows/ci.yml`): a `parser` job runs `cargo fmt`/`clippy`/`test`/wasm build;
   a `web` job installs a matching Rust toolchain + `wasm-bindgen-cli` (via `jetli/wasm-bindgen-action`)
   before `npm ci`/`lint`/`test`/`build`, since the web build depends on the generated bindings.
@@ -91,3 +95,5 @@ web/                     TypeScript + Vite UI, no framework
   or a stale fixture fails here instead of only in the browser), `main.test.ts` (mocks `./parser`
   to test the UI wiring - empty input, success/error paths, inspector/jump/example/storage
   wiring - without touching wasm at all).
+- Coverage: `cargo llvm-cov --workspace --summary-only` measures the Rust parser; `npm run
+  test:coverage` measures the TypeScript UI with V8 coverage.

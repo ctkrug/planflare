@@ -88,12 +88,12 @@ checks, not vibes. Story 1 is the wow moment: it ships before anything optional.
   - A parse error shows the parser's specific error message inline, styled as an error state —
     not a console-only failure.
 
-- [ ] **14. Landing site (`site/`) matches the app's design system**
+- [x] **14. Landing site (`site/`) matches the app's design system**
   - `site/` uses the same tokens and fonts as `web/` (per the D4 ship gate) and links to the live
     app.
   - Builds to one static directory with relative asset paths, independently of `web/`.
 
-- [ ] **15. Accessibility pass**
+- [x] **15. Accessibility pass**
   - Every interactive control (engine select, textarea, buttons, tree nodes) has a visible focus
     state and is operable by keyboard alone (Tab / Enter / Escape).
   - `--text` on `--bg` and `--accent` on `--surface` both measure ≥ 4.5:1 contrast.
