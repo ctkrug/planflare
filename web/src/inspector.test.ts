@@ -82,6 +82,29 @@ describe("createInspector", () => {
     expect(inspector.element.hidden).toBe(true);
   });
 
+  it("keeps Tab focus inside the open dialog", () => {
+    const inspector = createInspector();
+    document.body.appendChild(inspector.element);
+    inspector.open(node({}), trigger);
+    const close = inspector.element.querySelector<HTMLButtonElement>(".inspector-close")!;
+
+    close.focus();
+    const tab = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    close.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(close);
+
+    const reverseTab = new KeyboardEvent("keydown", {
+      key: "Tab",
+      shiftKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    close.dispatchEvent(reverseTab);
+    expect(reverseTab.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(close);
+  });
+
   it("closing an already-closed inspector is a no-op", () => {
     const inspector = createInspector();
     document.body.appendChild(inspector.element);
