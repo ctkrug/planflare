@@ -77,11 +77,12 @@ function renderNode(
   const key = pathKey(path);
   const item = document.createElement("div");
   item.className = "tree-node";
-  item.setAttribute("role", "treeitem");
 
   const row = document.createElement("div");
   row.className = "tree-row";
   row.tabIndex = 0;
+  row.setAttribute("role", "treeitem");
+  row.setAttribute("aria-level", String(path.length + 1));
   if (node === hottest) {
     row.classList.add("tree-row-hottest");
   }
@@ -92,6 +93,7 @@ function renderNode(
   let childrenEl: HTMLElement | undefined;
 
   if (hasChildren) {
+    row.setAttribute("aria-expanded", String(!startCollapsed));
     toggle = document.createElement("button");
     toggle.type = "button";
     toggle.className = "tree-toggle";
@@ -160,6 +162,7 @@ function renderNode(
       event.stopPropagation();
       const expanded = toggle!.getAttribute("aria-expanded") === "true";
       toggle!.setAttribute("aria-expanded", String(!expanded));
+      row.setAttribute("aria-expanded", String(!expanded));
       toggle!.setAttribute("aria-label", expanded ? "Expand node" : "Collapse node");
       toggle!.textContent = expanded ? "▸" : "▾";
       if (expanded) {
