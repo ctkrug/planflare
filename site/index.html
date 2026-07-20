@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Planscope turns database EXPLAIN output into a readable interactive cost tree." />
+    <title>Planscope — read the plan, find the cost</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FAFAF9'/%3E%3Crect x='1' y='1' width='30' height='30' fill='none' stroke='%2314161A' stroke-width='2'/%3E%3Cpath d='M10 25V7h7a5 5 0 010 10h-7' fill='none' stroke='%2314161A' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23D6331B'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main>
+      <nav aria-label="Primary navigation">
+        <span class="wordmark">Plan<em>scope</em></span>
+        <a class="nav-link" href="https://apps.charliekrug.com/planscope/">Open the app <span aria-hidden="true">↗</span></a>
+      </nav>
+
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">QUERY PLAN READER / 01</p>
+          <h1 id="hero-heading">Find the cost.<br /><span>Not the noise.</span></h1>
+          <p class="lede">Paste a Postgres, MySQL, or SQLite EXPLAIN plan. Planscope turns the wall of output into a cost tree and marks the node burning your runtime.</p>
+          <a class="cta" href="https://apps.charliekrug.com/planscope/">Visualize a plan <span aria-hidden="true">→</span></a>
+          <p class="privacy">Runs entirely in your browser. Your query plan stays local.</p>
+        </div>
+
+        <div class="plan-card" aria-label="Example cost tree">
+          <div class="card-head"><span>POSTGRES / ANALYZE</span><span class="live">● parsed</span></div>
+          <div class="tree" role="img" aria-label="Example tree with a Hash Join and a highlighted Sequential Scan on events">
+            <div class="tree-row"><span class="chevron">▾</span><strong>Hash Join</strong><span>9.00 ms</span></div>
+            <div class="branch">
+              <div class="tree-row hot"><span class="chevron">·</span><strong>Seq Scan on events</strong><span>7.20 ms</span><b>HOTTEST</b></div>
+              <div class="tree-row"><span class="chevron">·</span><strong>Index Scan on users</strong><span>0.80 ms</span></div>
+            </div>
+          </div>
+          <p class="card-note">est 2 rows <span>→</span> actual 200 rows</p>
+        </div>
+      </section>
+
+      <section class="principles" aria-label="Planscope capabilities">
+        <article><span>01</span><h2>One tree shape</h2><p>Postgres, MySQL, and SQLite converge on one clear model.</p></article>
+        <article><span>02</span><h2>Runtime first</h2><p>Self-time reveals the expensive node instead of rewarding the outer wrapper.</p></article>
+        <article><span>03</span><h2>Local by default</h2><p>A WebAssembly parser runs on your device with no database connection.</p></article>
+      </section>
+    </main>
+  </body>
+</html>
